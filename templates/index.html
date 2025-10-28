@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAZER SYSTEM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4ecca3;
+            --secondary: #2d4059;
+            --dark: #1a1a2e;
+            --darker: #0f0f1a;
+            --light: #eeeeee;
+            --accent: #ff6b6b;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark), var(--secondary));
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Tam Ekran Arka Plan Fotoğrafı */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.ibb.co/wZHr8rTg/MG-20251028-133908-450.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+        }
+
+        /* Beyaz Işık Animasyonu */
+        .light-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 25%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0.1) 75%,
+                transparent 100%
+            );
+            z-index: -1;
+            animation: lightSweep 6s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes lightSweep {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .system-container {
+            display: none;
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* YENİ MENÜ TASARIMI */
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(78, 204, 163, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* YENİ SIDEBAR TASARIMI */
+        .sidebar {
+            position: fixed;
+            left: -350px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+            backdrop-filter: blur(12px) saturate(140%);
+            -webkit-backdrop-filter: blur(12px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-right: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 18px 40px rgba(2,6,23,0.6);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,230,255,0.9) transparent;
+            z-index: 999;
+            padding: 14px;
+            border-radius: 14px;
+            transform: translateX(-22px) translateY(0) scale(0.995);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .32s cubic-bezier(.2,.9,.2,1), opacity .28s ease, box-shadow .28s;
+        }
+
+        .sidebar.active {
+            transform: translateX(0) translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+            left: 12px;
+            top: 12px;
+            height: calc(100% - 24px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 18px 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+
+        .profile-pic {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            background: linear-gradient(90deg, #0ff, #08f);
+            padding: 2px;
+            box-sizing: content-box;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .username {
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .membership {
+            font-size: 13px;
+            color: #9eeef8;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 700;
+            background: linear-gradient(90deg, rgba(6,182,212,0.08), rgba(124,58,237,0.06));
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+            margin-top: 5px;
+        }
+
+        .menu-items {
+            padding: 8px 4px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #c7d0da;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.28s, color 0.28s, transform .12s;
+            border-radius: 10px;
+            background: transparent;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px);
+            background: rgba(255,255,255,0.02);
+            color: #e6f9ff;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(90deg, rgba(0,230,255,0.06), rgba(124,58,237,0.04));
+            color: #a8fff0;
+            box-shadow: 0 10px 30px rgba(6,8,15,0.55);
+        }
+
+        .menu-item i {
+            width: 20px;
+            min-width: 20px;
+            text-align: center;
+            color: #9aa4b2;
+            transition: color .3s;
+        }
+
+        .section-title {
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #9aa4b2;
+            font-size: 12px;
+            margin: 14px 6px 8px 6px;
+            letter-spacing: 1px;
+        }
+
+        .submenu {
+            background: linear-gradient(180deg, rgba(10,12,18,0.48), rgba(6,8,12,0.32));
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.36s ease, padding 0.28s ease;
+            margin: 6px 8px 10px 8px;
+            padding: 0;
+        }
+
+        .submenu.open {
+            max-height: 680px;
+            padding: 8px 8px 12px 16px;
+        }
+
+        .submenu li {
+            list-style: none;
+            margin: 4px 0;
+        }
+
+        .submenu li a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #d3dbe3;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background .18s, transform .12s;
+            background: transparent;
+        }
+
+        .submenu li a:hover {
+            background-color: rgba(255,255,255,0.02);
+            color: #a8fff0;
+            transform: translateY(-3px);
+        }
+
+        /* BADGE styling improved */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            user-select: none;
+            white-space: nowrap;
+            box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+            position: relative;
+        }
+
+        .badge.free {
+            background: linear-gradient(90deg,#22c55e,#10b981);
+            color: #04210b;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.06);
+        }
+
+        .badge.free::before {
+            content: "✔";
+            font-weight: 900;
+            font-size: 11px;
+            display: inline-block;
+            filter: drop-shadow(0 2px 6px rgba(16,185,129,0.18));
+        }
+
+        .badge.premium {
+            background: linear-gradient(90deg,#ffd166,#ff8c00);
+            color: #2b1300;
+            font-weight: 900;
+        }
+
+        .badge.premium::before {
+            content: "★";
+            font-weight: 900;
+            font-size: 12px;
+            margin-right: 2px;
+            color: rgba(255,255,255,0.95);
+            text-shadow: 0 2px 6px rgba(255,150,0,0.18);
+        }
+
+        .badge.premium::after {
+            content: "";
+            position: absolute;
+            left: -6px;
+            right: -6px;
+            top: -6px;
+            bottom: -6px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, rgba(255,200,80,0.12), transparent 25%);
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        .badge.year {
+            background: linear-gradient(110deg,#06b6d4,#0ea5e9);
+            color: white;
+        }
+
+        .premium-section {
+            margin: 20px 6px 10px 6px;
+            font-weight: 700;
+            font-size: 13px;
+            color: #ffd700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 6px #ffd700;
+        }
+
+        /* Menü içi X butonu */
+        #menu-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.18);
+            color: #fff;
+            border: 0;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 1100;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: background .12s;
+        }
+
+        #menu-close-btn:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .menu-locked {
+            opacity: 0.44;
+            pointer-events: none;
+            filter: grayscale(0.18);
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s;
+        }
+
+        .menu-item.expanded .arrow {
+            transform: rotate(90deg);
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        /* YENİ ANA SAYFA ANİMASYONU */
+        .welcome-message {
+            font-size: 72px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(78, 204, 163, 0.8);
+            animation: glow 3s infinite alternate;
+            margin-bottom: 20px;
+            margin-top: 100px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .wazer-nabi {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .warning-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            font-weight: bold;
+            color: #ffcccc;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .query-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px auto;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: left;
+            animation: slideUp 0.5s ease;
+        }
+
+        .query-section.active {
+            display: block;
+        }
+
+        .query-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .query-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--light);
+        }
+
+        input, select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary), #3da88a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            display: none;
+            border-left: 4px solid var(--primary);
+            animation: slideIn 0.5s ease;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result.active {
+            display: block;
+        }
+
+        /* YENİ TABLO STİLİ */
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .result-table th {
+            background: rgba(78, 204, 163, 0.3);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: bold;
+            color: var(--primary);
+            border-bottom: 2px solid rgba(78, 204, 163, 0.5);
+        }
+
+        .result-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .result-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .json-result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.8s ease;
+        }
+
+        .login-title {
+            font-size: 32px;
+            margin-bottom: 25px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .error-message {
+            color: var(--accent);
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            animation: shake 0.5s;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: var(--primary);
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(78, 204, 163, 0.7); }
+            to { text-shadow: 0 0 20px rgba(78, 204, 163, 0.9), 0 0 30px rgba(78, 204, 163, 0.5); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 300px;
+            }
+
+            .welcome-message {
+                font-size: 48px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .wazer-nabi {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tam Ekran Arka Plan Fotoğrafı -->
+    <div class="background-image"></div>
+    
+    <!-- Beyaz Işık Animasyonu -->
+    <div class="light-overlay"></div>
+    
+    <!-- Particles.js Container -->
+    <div id="particles-js"></div>
+
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1 class="login-title"><i class="fas fa-shield-alt"></i> WAZER SYSTEM</h1>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-key"></i> Şifre</label>
+                    <input type="password" id="password" placeholder="Şifreyi girin" required>
+                </div>
+                <button type="submit"><i class="fas fa-sign-in-alt"></i> Giriş Yap</button>
+            </form>
+            <div class="error-message" id="errorMessage"><i class="fas fa-exclamation-triangle"></i> Hatalı şifre! Lütfen tekrar deneyin.</div>
+            <div class="api-status">
+                <div class="status-dot"></div>
+                <span>API Sistemleri Aktif</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Container -->
+    <div class="system-container" id="systemContainer">
+        <div class="header">
+            <div class="logo">𝑵𝑨𝑩İ 𝑽𝑬 𝑾𝑨𝒁𝑬𝑹 𝑺𝒀𝑺𝑻𝑬𝑴 𝑺𝑼𝑵𝑨𝑹...</div>
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <!-- YENİ MENÜ TASARIMI -->
+        <div class="sidebar" id="sidebar">
+            <button id="menu-close-btn" title="Kapat">✕</button>
+            <div class="user-info">
+                <div class="profile-pic">
+                    <img src="https://i.ibb.co/NdRMtZzV/MG-20251028-224713-861.jpg" alt="Profil Fotoğrafı">
+                </div>
+                <div>
+                    <div class="username">WAZER</div>
+                    <div class="membership" tabindex="0">♡ Premium Üyelik</div>
+                </div>
+            </div>
+
+            <div class="menu-items">
+                <ul>
+                    <li>
+                        <a href="#" class="menu-item active" tabindex="0" aria-current="page" id="anaSayfaBtn">
+                            <i class="fas fa-home" aria-hidden="true"></i> Ana Sayfa
+                        </a>
+                    </li>
+
+                    <li class="section-title" aria-hidden="true">NABİ API'LERİ</li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-temel-sorgular" id="btn-temel-sorgular">
+                            <i class="fas fa-database" aria-hidden="true"></i> Temel Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-temel-sorgular" aria-labelledby="btn-temel-sorgular">
+                            <li><a href="#" class="api-call" data-target="adSoyadSorgu">Ad Soyad <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="tcSorgulama">TC Sorgu <span class="badge free" aria-label="Ücretsiz">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="telegramSorgu">Telegram Bilgi <span class="badge year" aria-label="2024 Yılı">2024</span></a></li>
+                            <li><a href="#" class="api-call" data-target="ipSorgu">IP Sorgulama <span class="badge free">Free</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-araclar" id="btn-araclar">
+                            <i class="fas fa-tools" aria-hidden="true"></i> Araçlar <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-araclar" aria-labelledby="btn-araclar">
+                            <li><a href="#" class="api-call" data-target="smsBomber">SMS Bomber <span class="badge year">2024</span></a></li>
+                            <li><a href="#" class="api-call" data-target="logSorgu">Log Sorgu <span class="badge free">Free</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-ai" id="btn-ai">
+                            <i class="fas fa-robot" aria-hidden="true"></i> AI İşlemleri <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-ai" aria-labelledby="btn-ai">
+                            <li><a href="#" class="api-call" data-target="aiSorgu">AI Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-kart-islemleri" id="btn-kart-islemleri">
+                            <i class="fas fa-credit-card" aria-hidden="true"></i> Kart İşlemleri <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-kart-islemleri" aria-labelledby="btn-kart-islemleri">
+                            <li><a href="#" class="api-call" data-target="binSorgu">BIN Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="paparaSorgu">Papara Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="ininalSorgu">Ininal Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-aile-sorgulari" id="btn-aile-sorgulari">
+                            <i class="fas fa-users" aria-hidden="true"></i> Aile Sorguları <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-aile-sorgulari" aria-labelledby="btn-aile-sorgulari">
+                            <li><a href="#" class="api-call" data-target="aileSorgu">Aile Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="sulaleSorgu">Sülale Sorgulama <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-egitim-sorgulari" id="btn-egitim-sorgulari">
+                            <i class="fas fa-graduation-cap" aria-hidden="true"></i> Eğitim Sorguları <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-egitim-sorgulari" aria-labelledby="btn-egitim-sorgulari">
+                            <li><a href="#" class="api-call" data-target="lgsSorgu">LGS Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="lgsHanedanSorgu">LGS Hanedan <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="okulNoHanedanSorgu">Okul No Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="eKursSorgu">E-Kurs Sorgulama <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li class="section-title" aria-hidden="true">NEWVIP API'LERİ</li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-newvip-sorgular" id="btn-newvip-sorgular">
+                            <i class="fas fa-search" aria-hidden="true"></i> Detaylı Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-newvip-sorgular" aria-labelledby="btn-newvip-sorgular">
+                            <li><a href="#" class="api-call" data-target="ipLookup">IP Lookup <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="usernameSorgu">Username Sorgu <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="vpnSorgu">VPN Sorgu <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="breachSorgu">Breach Sorgu <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="metadataSorgu">Metadata Sorgu <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="scriptSorgu">Script Sorgu <span class="badge free">Free</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-sosyal-medya" id="btn-sosyal-medya">
+                            <i class="fas fa-share-alt" aria-hidden="true"></i> Sosyal Medya <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-sosyal-medya" aria-labelledby="btn-sosyal-medya">
+                            <li><a href="#" class="api-call" data-target="instagramSorgu">Instagram Sorgu <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="instagramNewSorgu">Instagram (New) <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="telegramNewSorgu">Telegram (New) <span class="badge free">Free</span></a></li>
+                            <li><a href="#" class="api-call" data-target="whatsappSorgu">WhatsApp Sorgu <span class="badge free">Free</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li class="premium-section" aria-hidden="true">GELİŞMİŞ SORGULAR</li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-ozel-sorgular" id="btn-ozel-sorgular">
+                            <i class="fas fa-crown" aria-hidden="true"></i> Özel Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-ozel-sorgular" aria-labelledby="btn-ozel-sorgular">
+                            <li><a href="#" class="api-call" data-target="secmenSorgu">Seçmen Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="ogretmenSorgu">Öğretmen Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="yabanciSorgu">Yabancı Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="vesikaSorgu">Vesika Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="tapuSorgu">Tapu Sorgulama <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="isKaydiSorgu">İş Kaydı Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-kisisel-sorgular" id="btn-kisisel-sorgular">
+                            <i class="fas fa-user" aria-hidden="true"></i> Kişisel Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-kisisel-sorgular" aria-labelledby="btn-kisisel-sorgular">
+                            <li><a href="#" class="api-call" data-target="adSoyadProSorgu">Ad Soyad Pro <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="hayatHikayesiSorgu">Hayat Hikayesi <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="isYeriSorgu">İş Yeri Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="tcGsmSorgu">TC GSM Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="gsmTcSorgu">GSM TC Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-adres-sorgulari" id="btn-adres-sorgulari">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> Adres Sorguları <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-adres-sorgulari" aria-labelledby="btn-adres-sorgulari">
+                            <li><a href="#" class="api-call" data-target="adresSorgu">Adres Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="apartmanSorgu">Apartman Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="adiIlIlceSorgu">Adı İl İlçe Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-resmi-sorgular" id="btn-resmi-sorgular">
+                            <i class="fas fa-file-alt" aria-hidden="true"></i> Resmi Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-resmi-sorgular" aria-labelledby="btn-resmi-sorgular">
+                            <li><a href="#" class="api-call" data-target="sertifikaSorgu">Sertifika Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="turknetSorgu">Turknet Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="seriNoSorgu">Seri No Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="sgkSorgu">SGK Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-arac-sorgulari" id="btn-arac-sorgulari">
+                            <i class="fas fa-car" aria-hidden="true"></i> Araç Sorguları <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-arac-sorgulari" aria-labelledby="btn-arac-sorgulari">
+                            <li><a href="#" class="api-call" data-target="plakaSorgu">Plaka Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="plakaIsimSorgu">Plaka İsim Sorgu <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="menu-item" tabindex="0" aria-expanded="false" aria-controls="submenu-diger-sorgular" id="btn-diger-sorgular">
+                            <i class="fas fa-ellipsis-h" aria-hidden="true"></i> Diğer Sorgular <span class="arrow">▶</span>
+                        </a>
+                        <ul class="submenu" id="submenu-diger-sorgular" aria-labelledby="btn-diger-sorgular">
+                            <li><a href="#" class="api-call" data-target="passportSorgu">Passport Sorgu <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="deviceInfoSorgu">Device Info <span class="badge premium">Premium</span></a></li>
+                            <li><a href="#" class="api-call" data-target="reverseImageSorgu">Reverse Image <span class="badge premium">Premium</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- YENİ ANA SAYFA TASARIMI -->
+            <div id="dashboard">
+                <h1 class="welcome-message">WAZER SYSTEM</h1>
+                <div class="wazer-nabi">Wazer Ve Nabi System Sunar...</div>
+                <p class="subtitle">Sol üst menüden sorgu seçeneklerine erişebilirsiniz</p>
+                
+                <div class="warning-message">
+                    <i class="fas fa-exclamation-triangle"></i> BU PANEL ÜCRETSİZ PANELDİR PARAYLA SATMAYA KALKANLAR ANASININ AMINDA SU İÇENLERDİR
+                </div>
+            </div>
+
+            <!-- Nabi API Sorgu Bölümleri -->
+            <div class="query-section" id="adSoyadSorgu">
+                <h2 class="query-title"><i class="fas fa-user"></i> Ad Soyad Sorgu</h2>
+                <form class="query-form" id="adSoyadForm">
+                    <div class="form-group">
+                        <label for="adSoyadAd">Ad</label>
+                        <input type="text" id="adSoyadAd" placeholder="Ad girin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adSoyadSoyad">Soyad</label>
+                        <input type="text" id="adSoyadSoyad" placeholder="Soyad girin" required>
+                    </div>
+                    <button type="submit"><i class="fas fa-search"></i> Sorgula</button>
+                </form>
+                <div class="loading" id="adSoyadLoading"><i class="fas fa-spinner"></i> Sorgu yapılıyor...</div>
+                <div class="result" id="adSoyadResult">
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Alan</th>
+                                <th>Değer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adSoyadTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Diğer sorgu bölümleri buraya gelecek -->
+            <!-- Kısaltma yapıyorum, tüm sorgu bölümleri burada olacak -->
+
+        </div>
+    </div>
+
+    <!-- Particles.js Library -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script>
+        // Particles.js Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 100, density: { enable: true, value_area: 800 } },
+                    color: { value: "#4ecca3" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#4ecca3",
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 3,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    }
+                }
+            });
+        });
+
+        // Login System
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (password === 'Wazermis') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('systemContainer').style.display = 'block';
+            } else {
+                errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        // YENİ MENÜ SİSTEMİ
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.getElementById('menuToggle');
+        const menuCloseBtn = document.getElementById('menu-close-btn');
+        const anaSayfaBtn = document.getElementById('anaSayfaBtn');
+
+        function toggleMenu(e) {
+            const opening = !sidebar.classList.contains('active');
+            if (opening) openMenu(); else closeMenu();
+        }
+
+        function openMenu() {
+            sidebar.classList.add('active');
+            menuBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeMenu() {
+            sidebar.classList.remove('active');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        menuBtn.addEventListener('click', function(e){
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        menuCloseBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            closeMenu();
+        });
+
+        document.addEventListener('click', function(e){
+            if (!sidebar.classList.contains('active')) return;
+            const isInside = sidebar.contains(e.target) || (menuBtn && menuBtn.contains(e.target));
+            if (!isInside) closeMenu();
+        });
+
+        document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                if (sidebar.classList.contains('active')) {
+                    e.preventDefault();
+                    closeMenu();
+                }
+            }
+        });
+
+        // Ana sayfaya dönüş
+        anaSayfaBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Tüm sorgu bölümlerini gizle
+            document.querySelectorAll('.query-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Dashboard'ı göster
+            document.getElementById('dashboard').style.display = 'flex';
+            // Menüyü kapat (mobil için)
+            if (window.innerWidth <= 768) {
+                closeMenu();
+            }
+        });
+
+        // Alt menüleri açma/kapatma
+        document.querySelectorAll('.menu-item[aria-controls]').forEach(btn => {
+            btn.addEventListener('click', function(e){
+                e.preventDefault();
+                const submenuId = btn.getAttribute('aria-controls');
+                const submenu = document.getElementById(submenuId);
+                if(!submenu) return;
+                const isOpen = submenu.classList.contains('open');
+                
+                // Diğer açık menüleri kapat
+                document.querySelectorAll('.submenu.open').forEach(openMenu => {
+                    if(openMenu !== submenu){
+                        openMenu.classList.remove('open');
+                        const parentBtn = document.querySelector(`[aria-controls="${openMenu.id}"]`);
+                        if (parentBtn) { 
+                            parentBtn.setAttribute('aria-expanded', 'false'); 
+                            parentBtn.classList.remove('expanded'); 
+                        }
+                    }
+                });
+                
+                if (isOpen) {
+                    submenu.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('expanded');
+                } else {
+                    submenu.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('expanded');
+                    if (!sidebar.classList.contains('active')) openMenu();
+                }
+            });
+        });
+
+        // API çağrıları için genel fonksiyon
+        async function makeApiCall(apiUrl, loadingElement, resultElement, tableBodyElement) {
+            try {
+                loadingElement.style.display = 'block';
+                resultElement.classList.remove('active');
+
+                // Rate limit kontrolü
+                if (window.lastApiCall && Date.now() - window.lastApiCall < 1000) {
+                    throw new Error('API çağrı limiti: Lütfen 1 saniye bekleyin');
+                }
+                window.lastApiCall = Date.now();
+
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`API hatası: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Tabloyu doldur
+                if (tableBodyElement) {
+                    tableBodyElement.innerHTML = '';
+                    for (const [key, value] of Object.entries(data)) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${key}</td>
+                            <td>${typeof value === 'object' ? JSON.stringify(value) : value}</td>
+                        `;
+                        tableBodyElement.appendChild(row);
+                    }
+                }
+                
+                resultElement.classList.add('active');
+
+            } catch (error) {
+                if (tableBodyElement) {
+                    tableBodyElement.innerHTML = `
+                        <tr>
+                            <td>Hata</td>
+                            <td>${error.message}</td>
+                        </tr>
+                    `;
+                }
+                resultElement.classList.add('active');
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        // Menüden sorgu seçme
+        document.querySelectorAll('.api-call').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.getAttribute('data-target');
+
+                // Tüm sorgu bölümlerini gizle
+                document.querySelectorAll('.query-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Dashboard'ı gizle
+                document.getElementById('dashboard').style.display = 'none';
+
+                // Seçilen sorgu bölümünü göster
+                const targetElement = document.getElementById(target);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+
+                // Sidebar'ı kapat (mobil için)
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
+
+        // Ana sayfaya dönüş
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.header') && !e.target.closest('.menu-toggle') && !e.target.closest('.sidebar')) {
+                // Tüm sorgu bölümlerini gizle
+                document.querySelectorAll('.query-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                // Dashboard'ı göster
+                document.getElementById('dashboard').style.display = 'flex';
+            }
+        });
+
+        // F12 ve diğer geliştirici araçlarını engelleme
+        document.addEventListener('keydown', function(e) {
+            // F12 tuşunu engelle
+            if (e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+U engelleme
+            if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 67 || e.keyCode === 74)) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Ctrl+U (sayfa kaynağı) engelleme
+            if (e.ctrlKey && e.keyCode === 85) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Sağ tık engelleme
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Tüm formlar için event listener'lar
+        // Ad Soyad Sorgu
+        document.getElementById('adSoyadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ad = document.getElementById('adSoyadAd').value;
+            const soyad = document.getElementById('adSoyadSoyad').value;
+            const apiUrl = `https://nabi-sorgu-api.system.22web.org/ad_soyad?ad=${encodeURIComponent(ad)}&soyad=${encodeURIComponent(soyad)}`;
+            makeApiCall(apiUrl, document.getElementById('adSoyadLoading'), document.getElementById('adSoyadResult'), document.getElementById('adSoyadTableBody'));
+        });
+
+        // Diğer form event listener'ları buraya gelecek
+        // Kısaltma yapıyorum, tüm formlar burada olacak
+
+    </script>
+</body>
+</html>
